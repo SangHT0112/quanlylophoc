@@ -185,7 +185,7 @@ export default function SeatingChart({
             {columns.map((columnStudents, colIndex) => (
               <div 
                 key={colIndex} 
-                className="space-y-3 md:space-y-4 relative"
+                className="space-y-2 md:space-y-4 relative"
               >
                 {/* Thêm padding ngang cho từng cột */}
                 <div className="px-1.5 sm:px-0">
@@ -300,9 +300,19 @@ export default function SeatingChart({
                                     </div>
                                   )}
 
-                                  {!student.mouthScore && (
-                                    <div className="flex-1 text-xs px-1.5 sm:px-2 py-1 rounded font-medium border bg-gray-100 text-gray-600 border-gray-300 text-center">
-                                      <span className="text-[10px]">Chưa điểm</span>
+                                 {!student.mouthScore && (
+                                    <div 
+                                      className={`
+                                        flex-1 text-[10px] sm:text-xs 
+                                        px-1 sm:px-1.5 py-0.5 sm:px-1.5 
+                                        rounded font-medium border 
+                                        bg-gray-100 text-gray-600 border-gray-300 
+                                        text-center
+                                        whitespace-nowrap
+                                        min-w-0  
+                                      `}
+                                    >
+                                      Chưa điểm
                                     </div>
                                   )}
                                 </div>
@@ -339,7 +349,7 @@ export default function SeatingChart({
         /* Trên mobile - TĂNG MẠNH khoảng cách giữa các dãy bàn */
         @media (max-width: 640px) {
           .grid.grid-cols-4 {
-            gap: 20px !important;  /* Tăng lên 20px thay vì 16px */
+            gap: 16px !important;  /* Tăng lên 20px thay vì 16px */
           }
           
           /* Thêm đường phân cách rõ ràng giữa các cột */
@@ -392,9 +402,9 @@ export default function SeatingChart({
         }
         
         .landscape-cell {
-          padding: 6px !important;
-          font-size: 10px !important;
-          min-width: 65px !important;
+          font-size: 14px !important;  /* hoặc 12px nếu muốn to hơn */
+          padding: 3px !important;
+          min-width: 70px !important;
         }
         
         .landscape-score {

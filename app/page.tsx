@@ -93,6 +93,9 @@ export default function Home() {
           anh: 3,
           ly: 4,
           hoa: 5,
+          sinh: 6,
+          su: 7,
+          dia: 8,
         };
 
         const subjectId = subjectMap[selectedSubject] || 1;
@@ -139,6 +142,9 @@ export default function Home() {
         anh: 3,
         ly: 4,
         hoa: 5,
+        sinh: 6,
+        su: 7,
+        dia: 8,
       };
       const subjectId = subjectMap[selectedSubject] || 1;
 
@@ -186,7 +192,12 @@ export default function Home() {
           subject_id: selectedSubject === 'toan' ? 1 :
                       selectedSubject === 'van'  ? 2 :
                       selectedSubject === 'anh'  ? 3 :
-                      selectedSubject === 'ly'   ? 4 : 5,
+                      selectedSubject === 'ly'   ? 4 :
+                      selectedSubject === 'hoa'  ? 5 :
+                      selectedSubject === 'sinh' ? 6 :
+                      selectedSubject === 'su' ? 7 :
+                      selectedSubject === 'dia' ? 8 : 1,
+
           score_type: noteType || 'Miệng',
           score,
           teacher_note: note,
@@ -240,7 +251,7 @@ export default function Home() {
     // 2. Ghi participation vào DB (giữ nguyên code cũ của bạn)
     try {
       const subjectMap: Record<string, number> = {
-        toan: 1, van: 2, anh: 3, ly: 4, hoa: 5,
+        toan: 1, van: 2, anh: 3, ly: 4, hoa: 5, sinh: 6, su: 7, dia: 8,
       };
       const subjectId = subjectMap[selectedSubject] || 1;
 
@@ -280,47 +291,55 @@ export default function Home() {
     // setShowScoreModal(true);
   };
 
-  const handleRandomStudent = () => {
-    if (!classData || classData.students.length === 0) return
+const handleRandomStudent = () => {
+  if (!classData || classData.students.length === 0) return;
 
-    // 1. Lọc học sinh có mặt (KHÔNG vắng)
-    const presentStudents = classData.students.filter(
-      student => !absentStudents.includes(student.id)
-    )
+  const presentStudents = classData.students.filter(
+    student => !absentStudents.includes(student.id)
+  );
 
-    if (presentStudents.length === 0) {
-      alert('❌ Tất cả học sinh đều vắng hôm nay!')
-      return
-    }
-
-    // 2. Lọc học sinh có mặt VÀ chưa có điểm miệng
-    const presentStudentsWithoutScore = presentStudents.filter(
-      student => !student.mouthScore || student.mouthScore.trim() === ''
-    )
-
-    if (presentStudentsWithoutScore.length === 0) {
-      // Nếu tất cả học sinh có mặt đã có điểm, chọn ngẫu nhiên từ học sinh có mặt
-      // alert('📝 Tất cả học sinh có mặt đã có điểm. Sẽ chọn ngẫu nhiên từ học sinh có mặt.')
-      
-      // Ưu tiên học sinh ít phát biểu nhất
-      presentStudents.sort((a, b) => a.participationCount - b.participationCount)
-      const candidates = presentStudents.slice(0, Math.ceil(presentStudents.length * 0.3))
-      
-      startRandomAnimation(candidates, 'present')
-      return
-    }
-
-    // 3. Ưu tiên học sinh có mặt, chưa có điểm VÀ ít phát biểu
-    presentStudentsWithoutScore.sort((a, b) => a.participationCount - b.participationCount)
-    
-    // Lấy top 50% ít phát biểu nhất để random
-    const topCandidates = presentStudentsWithoutScore.slice(
-      0, 
-      Math.ceil(presentStudentsWithoutScore.length * 0.5)
-    )
-
-    startRandomAnimation(topCandidates, 'present')
+  if (presentStudents.length === 0) {
+    alert('❌ Tất cả học sinh đều vắng hôm nay!');
+    return;
   }
+
+  const noScore = presentStudents.filter(
+    s => !s.mouthScore || s.mouthScore.trim() === ''
+  );
+
+  const hasScore = presentStudents.filter(
+    s => s.mouthScore && s.mouthScore.trim() !== ''
+  );
+
+  let candidates: Student[] = [];
+
+  if (noScore.length > 0) {
+    // ── Cách 1: Ưu tiên cực mạnh ── (khuyến nghị dùng cái này trước)
+    // Cho toàn bộ noScore + một ít hasScore ít nói
+    candidates = [...noScore];
+
+    // Bổ sung ~20-30% từ nhóm đã có điểm (ưu tiên ít nói)
+    if (hasScore.length > 0) {
+      hasScore.sort((a, b) => a.participationCount - b.participationCount);
+      const supplementCount = Math.min(
+        Math.ceil(presentStudents.length * 0.25), // ~25% tổng lớp
+        hasScore.length
+      );
+      candidates = [...candidates, ...hasScore.slice(0, supplementCount)];
+    }
+  } else {
+    // Tất cả đã có điểm → ưu tiên ít nói
+    presentStudents.sort((a, b) => a.participationCount - b.participationCount);
+    candidates = presentStudents.slice(0, Math.ceil(presentStudents.length * 0.6));
+  }
+
+  // Nếu vẫn rỗng (ít xảy ra)
+  if (candidates.length === 0) {
+    candidates = presentStudents;
+  }
+
+  startRandomAnimation(candidates, 'present');
+};
 
   // Hàm phụ để chạy animation
   // Hàm phụ để chạy animation - THÊM tham số thứ 2
@@ -744,6 +763,7 @@ export default function Home() {
         <ScoreModal
           isOpen={showScoreModal}
           studentName={selectedStudent?.name || ''}
+          previousScore={selectedStudent?.mouthScore}
           onClose={() => setShowScoreModal(false)}
           onSave={handleSaveScore}
         />

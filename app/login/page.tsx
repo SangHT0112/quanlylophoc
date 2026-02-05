@@ -85,22 +85,6 @@ export default function LoginPage() {
             <p className="text-gray-600 mt-2">Dành cho Giáo viên & Quản trị viên</p>
           </div>
 
-          {/* Test buttons */}
-          <div className="mb-6 flex gap-2">
-            <button
-              onClick={() => fillCredentials('admin')}
-              className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded text-sm"
-            >
-              Admin Demo
-            </button>
-            <button
-              onClick={() => fillCredentials('teacher')}
-              className="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 rounded text-sm"
-            >
-              Teacher Demo
-            </button>
-          </div>
-
           {/* Login Form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Username */}

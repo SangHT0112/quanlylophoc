@@ -10,11 +10,12 @@ import { AlertCircle, CheckCircle } from 'lucide-react'
 interface ScoreModalProps {
   isOpen: boolean
   studentName: string
+  previousScore?: string | null
   onClose: () => void
   onSave: (score: number, noteType: string, note: string) => void
 }
 
-export default function ScoreModal({ isOpen, studentName, onClose, onSave }: ScoreModalProps) {
+export default function ScoreModal({ isOpen, studentName, previousScore, onClose, onSave }: ScoreModalProps) {
   const [scoreValue, setScoreValue] = useState('')
   const [error, setError] = useState('')
   const [isValid, setIsValid] = useState(false)
@@ -109,6 +110,15 @@ export default function ScoreModal({ isOpen, studentName, onClose, onSave }: Sco
           <DialogDescription className="text-gray-700 pt-1">
             Học sinh: <span className="font-bold text-slate-800">{studentName}</span>
           </DialogDescription>
+
+         {previousScore && (
+            <div className="mt-3 p-2.5 bg-blue-50 border border-blue-100 rounded-md text-sm">
+              <div className="flex justify-between items-center">
+                <span className="text-gray-700">Điểm miệng gần nhất:</span>
+                <span className="font-bold text-blue-700 text-base">{previousScore}</span>
+              </div>
+            </div>
+          )}
         </DialogHeader>
 
         <div className="space-y-4 py-2">
